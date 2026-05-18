@@ -56,8 +56,7 @@ The frontend uses Vanilla JavaScript and loads Tailwind CSS via CDN. No build st
 1. Open `frontend/public.html` in your web browser to view the **Public Portal**.
 2. Open `frontend/index.html` in your web browser to access the **Admin Dashboard**.
 3. **Default Admin Login:**
-   - **Username:** `admin`
-   - **Password:** `admin123`
+   -Default credentials can be configured in the database setup.
 
 ---
 
@@ -74,3 +73,6 @@ The frontend uses Vanilla JavaScript and loads Tailwind CSS via CDN. No build st
 - **Frontend:** HTML5, Tailwind CSS, Vanilla JavaScript, Lucide Icons
 - **Backend:** Node.js, Express.js, CORS
 - **Database:** MySQL (using `mysql2/promise`)
+
+## 👨‍💻 Author
+Priyanshu Prakash
