@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LifeFlow | Public Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: 'Outfit', sans-serif; }
+        .glass { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.3); }
+        .hero-gradient { background: radial-gradient(circle at top right, #fff1f2, #ffffff); }
+        @keyframes fade-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+        @keyframes pulse-soft { 0%, 100% { opacity: 1; } 50% { opacity: 0.8; } }
+        .animate-fade { animation: fade-in 0.6s ease-out forwards; }
+        .animate-float { animation: float 6s ease-in-out infinite; }
+        .creator-card-glow { transition: all 0.5s ease; }
+        .creator-card-glow:hover { transform: translateY(-10px) scale(1.02); box-shadow: 0 40px 80px -20px rgba(225, 29, 72, 0.2); }
+    </style>
+</head>
+<body class="hero-gradient min-h-screen text-slate-800">
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 p-6 flex justify-between items-center px-12 glass">
+        <a href="#" onclick="showPage('home')" class="flex items-center gap-3 text-rose-600 font-extrabold text-2xl">
+            <div class="w-10 h-10 bg-rose-600 text-white rounded-xl flex items-center justify-center shadow-lg shadow-rose-200">
+                <i data-lucide="droplet" class="w-6 h-6"></i>
+            </div>
+            <span>LifeFlow</span>
+        </a>
+        <div class="flex items-center gap-6" id="nav-actions">
+            <a href="#" onclick="showPage('home')" class="text-slate-600 font-medium hover:text-rose-600 transition">Home</a>
+            <a href="#" onclick="showPage('donate')" class="text-slate-600 font-medium hover:text-rose-600 transition">Donate Blood</a>
+            <a href="#" onclick="showPage('request')" class="text-slate-600 font-medium hover:text-rose-600 transition">Request Blood</a>
+            <button onclick="showPage('login')" id="login-btn" class="bg-rose-600 text-white px-6 py-2 rounded-full font-bold shadow-lg shadow-rose-100 hover:scale-105 transition active:scale-95">Login</button>
+            <div id="user-profile" class="hidden flex items-center gap-3 bg-slate-100 p-2 rounded-full pr-4">
+                <div class="w-8 h-8 bg-rose-600 text-white rounded-full flex items-center justify-center text-xs font-bold" id="user-initials">JD</div>
+                <span class="text-sm font-bold text-slate-700" id="user-name">John Doe</span>
+                <button onclick="logout()" class="text-slate-400 hover:text-rose-600"><i data-lucide="log-out" class="w-4 h-4"></i></button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="pt-32 px-12 max-w-7xl mx-auto">
+        <!-- Home Section -->
+        <section id="page-home" class="page-content animate-fade">
+            <div class="flex flex-col md:flex-row items-center gap-12 py-12">
+                <div class="flex-1 space-y-8">
+                    <h1 class="text-7xl font-extrabold text-slate-900 leading-tight">Every Drop <br><span class="text-rose-600 underline decoration-rose-200 underline-offset-8">Saves a Life.</span></h1>
+                    <p class="text-xl text-slate-500 leading-relaxed max-w-lg">Connect with local blood banks, donate with confidence, and request life-saving help in seconds. Join the LifeFlow network today.</p>
+                    <div class="flex gap-4">
+                        <button onclick="showPage('donate')" class="bg-slate-900 text-white px-8 py-4 rounded-2xl font-bold text-lg hover:bg-slate-800 transition shadow-xl">Become a Donor</button>
+                        <button onclick="showPage('request')" class="border-2 border-slate-200 text-slate-600 px-8 py-4 rounded-2xl font-bold text-lg hover:border-rose-400 hover:text-rose-600 transition">I Need Blood</button>
+                    </div>
+                    <div class="flex items-center gap-12 pt-8">
+                        <div><p class="text-3xl font-black text-rose-600">2.4k+</p><p class="text-slate-400 text-sm font-bold uppercase tracking-widest">Active Donors</p></div>
+                        <div><p class="text-3xl font-black text-slate-900">48</p><p class="text-slate-400 text-sm font-bold uppercase tracking-widest">Blood Banks</p></div>
+                    </div>
+                </div>
+                <div class="flex-1 relative">
+                    <div class="w-full aspect-square bg-rose-50 rounded-[40px] rotate-3 absolute -z-10 shadow-inner"></div>
+                    <div class="w-full aspect-square bg-white border border-slate-100 rounded-[40px] p-12 shadow-2xl relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-rose-100 rounded-bl-[80px] transition-all group-hover:w-40 group-hover:h-40"></div>
+                        <i data-lucide="heart" class="w-32 h-32 text-rose-500 mb-8"></i>
+                        <h3 class="text-3xl font-bold mb-4">Emergency Support</h3>
+                        <p class="text-slate-500 text-lg">We prioritize critical requests and coordinate with hospital networks in real-time.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Creator Card -->
+            <div class="mt-24 p-1 rounded-[40px] bg-gradient-to-br from-rose-500 to-orange-400 shadow-2xl shadow-rose-100 max-w-3xl mx-auto overflow-hidden creator-card-glow cursor-pointer group/card">
+                <div class="bg-white/90 backdrop-blur-xl rounded-[38px] p-10 flex flex-col md:flex-row items-center gap-10">
+                    <div class="relative group animate-float">
+                        <div class="w-32 h-32 bg-slate-900 rounded-[32px] flex items-center justify-center text-white shadow-2xl transition-all duration-500 group-hover:scale-105 group-hover:rotate-6">
+                            <i data-lucide="terminal" class="w-16 h-16 text-rose-500"></i>
+                        </div>
+                        <div class="absolute -top-3 -right-3 bg-rose-600 text-white px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter shadow-lg">Creator</div>
+                    </div>
+                    <div class="text-center md:text-left flex-1">
+                        <h4 class="text-rose-600 font-black uppercase tracking-[0.2em] text-[10px] mb-3">Project Lead & Architect</h4>
+                        <h3 class="text-5xl font-black text-slate-900 mb-4 tracking-tight">Priyanshu</h3>
+                        <p class="text-slate-500 text-lg leading-relaxed font-medium">Building modern solutions for critical healthcare infrastructure. LifeFlow is a vision brought to life to ensure every drop counts.</p>
+                        <div class="flex gap-4 mt-6 justify-center md:justify-start">
+                            <div class="px-4 py-2 bg-slate-50 rounded-full text-slate-500 text-xs font-bold border border-slate-100 flex items-center gap-2">
+                                <i data-lucide="github" class="w-4 h-4"></i> GitHub Verified
+                            </div>
+                            <div class="px-4 py-2 bg-rose-50 rounded-full text-rose-600 text-xs font-bold border border-rose-100 flex items-center gap-2">
+                                <i data-lucide="award" class="w-4 h-4"></i> Fullstack Dev
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Login Section -->
+        <section id="page-login" class="page-content hidden animate-fade max-w-md mx-auto py-12">
+            <div class="bg-white p-8 rounded-[32px] border border-slate-100 shadow-2xl">
+                <h2 class="text-3xl font-bold mb-2">Donor Login</h2>
+                <p class="text-slate-400 mb-8">Access your profile and track requests.</p>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-slate-400 mb-2">Contact Number</label>
+                        <input type="text" id="login-contact" class="w-full bg-slate-50 border-none rounded-xl p-4 focus:ring-2 focus:ring-rose-500 transition outline-none" placeholder="1234567890">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-slate-400 mb-2">Password</label>
+                        <input type="password" id="login-pass" class="w-full bg-slate-50 border-none rounded-xl p-4 focus:ring-2 focus:ring-rose-500 transition outline-none" placeholder="••••••••">
+                    </div>
+                    <button onclick="handleLogin()" class="w-full bg-rose-600 text-white py-4 rounded-2xl font-bold shadow-lg shadow-rose-100 hover:bg-rose-700 transition">Sign In</button>
+                    <p class="text-center text-sm text-slate-400">New here? <a href="#" onclick="showPage('donate')" class="text-rose-600 font-bold">Register as Donor</a></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Donate/Register Section -->
+        <section id="page-donate" class="page-content hidden animate-fade max-w-2xl mx-auto py-12">
+            <div class="bg-white p-10 rounded-[32px] border border-slate-100 shadow-2xl" id="donate-section-content">
+                <div id="register-form-container">
+                    <h2 class="text-3xl font-bold mb-2">Become a Hero</h2>
+                    <p class="text-slate-400 mb-8">Register as a life-saving donor in our network.</p>
+                    <form id="register-form" class="grid grid-cols-2 gap-6">
+                        <div class="col-span-2">
+                            <label class="block text-xs font-bold uppercase text-slate-400 mb-2">Full Name</label>
+                            <input type="text" id="reg-name" required class="w-full bg-slate-50 border-none rounded-xl p-4 focus:ring-2 focus:ring-rose-500 transition outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-400 mb-2">Blood Group</label>
+                            <select id="reg-group" class="w-full bg-slate-50 border-none rounded-xl p-4 focus:ring-2 focus:ring-rose-500 transition outline-none">
+                                <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
+                                <option>AB+</option><option>AB-</option><option>O+</option><option>O-</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-400 mb-2">Contact Number</label>
+                            <input type="text" id="reg-contact" required class="w-full bg-slate-50 border-none rounded-xl p-4 focus:ring-2 focus:ring-rose-500 transition outline-none">
+                        </div>
+                        <div class="col-span-2">
+                            <label class="block text-xs font-bold uppercase text-slate-400 mb-2">Create Password</label>
+                            <input type="password" id="reg-pass" required class="w-full bg-slate-50 border-none rounded-xl p-4 focus:ring-2 focus:ring-rose-500 transition outline-none" placeholder="••••••••">
+                        </div>
+                        <div class="col-span-2">
+                            <label class="block text-xs font-bold uppercase text-slate-400 mb-2">Home Address</label>
+                            <textarea id="reg-address" class="w-full bg-slate-50 border-none rounded-xl p-4 focus:ring-2 focus:ring-rose-500 transition outline-none" rows="3"></textarea>
+                        </div>
+                        <button type="submit" class="col-span-2 bg-slate-900 text-white py-5 rounded-2xl font-extrabold text-lg shadow-xl hover:bg-slate-800 transition">Register & Apply</button>
+                    </form>
+                </div>
+                <div id="donor-status-container" class="hidden text-center py-8">
+                    <div id="donor-status-icon" class="flex justify-center mb-4"></div>
+                    <h2 id="donor-status-title" class="text-3xl font-bold mb-2"></h2>
+                    <p id="donor-status-message" class="text-slate-500 mb-6"></p>
+
+                    <!-- Scheduling Form for Approved Donors -->
+                    <div id="schedule-donation-section" class="hidden text-left mt-8 bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                        <h3 class="text-xl font-bold mb-4">Schedule a Donation</h3>
+                        <form id="schedule-form" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-400 mb-2">Select Blood Bank</label>
+                                <select id="sched-bank" required class="w-full bg-white border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-rose-500 transition outline-none">
+                                    <option value="">Loading banks...</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase text-slate-400 mb-2">Select Date</label>
+                                <input type="date" id="sched-date" required class="w-full bg-white border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-rose-500 transition outline-none">
+                            </div>
+                            <button type="submit" class="w-full bg-emerald-600 text-white py-3 rounded-xl font-bold shadow-lg shadow-emerald-100 hover:bg-emerald-700 transition">Confirm Appointment</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Request Section -->
+        <section id="page-request" class="page-content hidden animate-fade max-w-2xl mx-auto py-12">
+            <div class="bg-white p-10 rounded-[32px] border border-slate-100 shadow-2xl">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="p-3 bg-rose-100 text-rose-600 rounded-2xl"><i data-lucide="alert-circle" class="w-8 h-8"></i></div>
+                    <div>
+                        <h2 class="text-3xl font-bold">Blood Request Form</h2>
+                        <p class="text-slate-400">Our team will coordinate with nearby banks.</p>
+                    </div>
+                </div>
+                <form id="request-form" class="space-y-6">
+                    <div id="req-auth-msg" class="bg-amber-50 p-4 rounded-xl text-amber-700 text-sm font-medium border border-amber-100 mb-4">
+                        Please <a href="#" onclick="showPage('login')" class="underline font-bold">login</a> to pre-fill your contact details.
+                    </div>
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="col-span-2">
+                            <label class="block text-xs font-bold uppercase text-slate-400 mb-2">Who is this request for?</label>
+                            <select id="req-for" class="w-full bg-slate-50 border-none rounded-xl p-4 focus:ring-2 focus:ring-rose-500 transition outline-none font-bold" onchange="toggleRelationField()">
+                                <option value="Myself">Myself</option>
+                                <option value="Someone Else">Someone Else</option>
+                            </select>
+                        </div>
+                        <div class="col-span-2 hidden" id="req-relation-container">
+                            <label class="block text-xs font-bold uppercase text-slate-400 mb-2">Relationship with Patient</label>
+                            <input type="text" id="req-relation" class="w-full bg-slate-50 border-none rounded-xl p-4 focus:ring-2 focus:ring-rose-500 transition outline-none" placeholder="e.g., Father, Friend, Colleague">
+                        </div>
+                        <div class="col-span-2">
+                            <label class="block text-xs font-bold uppercase text-slate-400 mb-2">Patient Name</label>
+                            <input type="text" id="req-name" required class="w-full bg-slate-50 border-none rounded-xl p-4 focus:ring-2 focus:ring-rose-500 transition outline-none" placeholder="Name of the person needing blood">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-400 mb-2">Blood Group Required</label>
+                            <select id="req-group" class="w-full bg-slate-50 border-none rounded-xl p-4 focus:ring-2 focus:ring-rose-500 transition outline-none">
+                                <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
+                                <option>AB+</option><option>AB-</option><option>O+</option><option>O-</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-400 mb-2">Urgency</label>
+                            <select id="req-urgency" class="w-full bg-slate-50 border-none rounded-xl p-4 focus:ring-2 focus:ring-rose-500 transition outline-none font-bold text-rose-600">
+                                <option>Emergency (ASAP)</option><option>High</option><option>Normal</option>
+                            </select>
+                        </div>
+                        <div class="col-span-2">
+                            <label class="block text-xs font-bold uppercase text-slate-400 mb-2">Hospital Name & City</label>
+                            <input type="text" id="req-hospital" required class="w-full bg-slate-50 border-none rounded-xl p-4 focus:ring-2 focus:ring-rose-500 transition outline-none">
+                        </div>
+                        <div class="col-span-2">
+                            <label class="block text-xs font-bold uppercase text-slate-400 mb-2">Your Contact Number</label>
+                            <input type="text" id="req-contact" required class="w-full bg-slate-50 border-none rounded-xl p-4 focus:ring-2 focus:ring-rose-500 transition outline-none">
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-rose-600 text-white py-5 rounded-2xl font-extrabold text-lg shadow-lg shadow-rose-100 hover:bg-rose-700 transition">Submit Urgent Request</button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-20 border-t border-slate-100 py-12 px-12 glass">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+            <div class="flex items-center gap-3 text-slate-400 font-bold">
+                <i data-lucide="droplet" class="w-5 h-5 text-rose-500"></i>
+                <span>LifeFlow System</span>
+            </div>
+            <div class="flex gap-8 text-sm text-slate-500">
+                <a href="#" class="hover:text-rose-600 transition">About Us</a>
+                <a href="#" class="hover:text-rose-600 transition">Privacy Policy</a>
+                <a href="#" class="hover:text-rose-600 transition">Terms of Service</a>
+                <a href="index.html" target="_blank" class="flex items-center gap-2 font-bold text-slate-700 hover:text-rose-600 transition">
+                    <i data-lucide="shield" class="w-4 h-4"></i> Staff Login
+                </a>
+            </div>
+            <p class="text-xs text-slate-400">© 2026 LifeFlow. Developed with ❤️ by <span class="font-bold text-slate-600">Priyanshu</span>. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="fixed bottom-12 right-12 z-[100] space-y-3 pointer-events-none"></div>
+
+    <script src="js/public.js"></script>
+    <script>lucide.createIcons();</script>
+</body>
+</html>

@@ -1,0 +1,104 @@
+-- ============================================================
+-- LIFEFLOW UPDATED DATABASE SCHEMA
+-- Generated on: 2026-05-15
+-- ============================================================
+
+USE blood_bank_db;
+
+-- 1. BLOOD BANK
+CREATE TABLE `blood_bank` (
+  `bank_id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  `location` varchar(150) NOT NULL,
+  PRIMARY KEY (`bank_id`)
+);
+
+-- 2. DONOR (Includes Phase 7 Status & Password)
+CREATE TABLE `donor` (
+  `donor_id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  `blood_group` enum('A+','A-','B+','B-','AB+','AB-','O+','O-') NOT NULL,
+  `contact` varchar(15) NOT NULL,
+  `address` varchar(200) DEFAULT NULL,
+  `status` enum('Pending','Approved') DEFAULT 'Pending',
+  `password` varchar(255) DEFAULT 'donor123',
+  PRIMARY KEY (`donor_id`)
+);
+
+-- 3. BLOOD INVENTORY
+CREATE TABLE `blood` (
+  `blood_id` int NOT NULL AUTO_INCREMENT,
+  `blood_group` enum('A+','A-','B+','B-','AB+','AB-','O+','O-') NOT NULL,
+  `quantity` int NOT NULL DEFAULT '1',
+  `donor_id` int NOT NULL,
+  `bank_id` int NOT NULL,
+  `donated_on` date DEFAULT (curdate()),
+  PRIMARY KEY (`blood_id`),
+  FOREIGN KEY (`donor_id`) REFERENCES `donor` (`donor_id`) ON DELETE CASCADE,
+  FOREIGN KEY (`bank_id`) REFERENCES `blood_bank` (`bank_id`) ON DELETE CASCADE
+);
+
+-- 4. PATIENT
+CREATE TABLE `patient` (
+  `patient_id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  `blood_group` enum('A+','A-','B+','B-','AB+','AB-','O+','O-') NOT NULL,
+  `contact` varchar(15) NOT NULL,
+  PRIMARY KEY (`patient_id`)
+);
+
+-- 5. BLOOD REQUESTS (Phase 7 - Live Coordination)
+CREATE TABLE `blood_requests` (
+  `request_id` int NOT NULL AUTO_INCREMENT,
+  `patient_name` varchar(100) NOT NULL,
+  `blood_group` enum('A+','A-','B+','B-','AB+','AB-','O+','O-') NOT NULL,
+  `contact` varchar(15) NOT NULL,
+  `hospital_name` varchar(100) DEFAULT NULL,
+  `status` enum('Pending','Approved','Rejected') DEFAULT 'Pending',
+  `requested_on` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `urgency` varchar(50) DEFAULT 'Normal',
+  `patient_id` int DEFAULT NULL,
+  PRIMARY KEY (`request_id`),
+  FOREIGN KEY (`patient_id`) REFERENCES `patient` (`patient_id`) ON DELETE SET NULL
+);
+
+-- 6. RECEIVES (Junction table for distributions)
+CREATE TABLE `receives` (
+  `patient_id` int NOT NULL,
+  `blood_id` int NOT NULL,
+  `received_on` date DEFAULT (curdate()),
+  PRIMARY KEY (`patient_id`,`blood_id`),
+  FOREIGN KEY (`patient_id`) REFERENCES `patient` (`patient_id`) ON DELETE CASCADE,
+  FOREIGN KEY (`blood_id`) REFERENCES `blood` (`blood_id`) ON DELETE CASCADE
+);
+
+-- 7. HOSPITAL & STAFF
+CREATE TABLE `hospital` (
+  `hospital_id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  `location` varchar(150) NOT NULL,
+  `bank_id` int NOT NULL,
+  PRIMARY KEY (`hospital_id`),
+  FOREIGN KEY (`bank_id`) REFERENCES `blood_bank` (`bank_id`) ON DELETE CASCADE
+);
+
+CREATE TABLE `staff` (
+  `staff_id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  `role` varchar(50) NOT NULL,
+  `bank_id` int NOT NULL,
+  PRIMARY KEY (`staff_id`),
+  FOREIGN KEY (`bank_id`) REFERENCES `blood_bank` (`bank_id`) ON DELETE CASCADE
+);
+
+-- 8. APPOINTMENTS (For Donor Scheduling)
+CREATE TABLE `appointments` (
+  `appointment_id` int NOT NULL AUTO_INCREMENT,
+  `donor_id` int NOT NULL,
+  `bank_id` int NOT NULL,
+  `appointment_date` date NOT NULL,
+  `status` enum('Scheduled','Completed','Cancelled') DEFAULT 'Scheduled',
+  PRIMARY KEY (`appointment_id`),
+  FOREIGN KEY (`donor_id`) REFERENCES `donor` (`donor_id`) ON DELETE CASCADE,
+  FOREIGN KEY (`bank_id`) REFERENCES `blood_bank` (`bank_id`) ON DELETE CASCADE
+);

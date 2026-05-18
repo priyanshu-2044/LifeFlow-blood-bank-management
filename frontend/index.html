@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LifeFlow | Blood Bank Management</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: 'Outfit', sans-serif; scroll-behavior: smooth; }
+        .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.3); }
+        .active-link { background: #fee2e2; color: #b91c1c; border-right: 4px solid #b91c1c; font-weight: 600; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        .card-hover { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); }
+        
+        .loader {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #e11d48;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        @keyframes slide-in {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .animate-slide-in { animation: slide-in 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased">
+    <!-- Login Screen -->
+    <div id="login-screen" class="fixed inset-0 bg-slate-900 z-[100] flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-3xl overflow-hidden shadow-2xl p-10 space-y-8">
+            <div class="flex flex-col items-center text-center">
+                <div class="w-16 h-16 bg-rose-600 text-white rounded-2xl flex items-center justify-center shadow-xl shadow-rose-200 mb-6">
+                    <i data-lucide="droplet" class="w-10 h-10"></i>
+                </div>
+                <h1 class="text-3xl font-bold text-slate-800">LifeFlow Admin</h1>
+                <p class="text-slate-500 mt-2">Sign in to manage the blood bank</p>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-400 mb-2">Username</label>
+                    <input type="text" id="login-user" value="admin" class="w-full border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-rose-500 outline-none transition" placeholder="Enter username">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-400 mb-2">Password</label>
+                    <input type="password" id="login-pass" value="admin123" class="w-full border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-rose-500 outline-none transition" placeholder="••••••••">
+                </div>
+                <div id="login-error" class="hidden text-rose-600 text-sm font-medium bg-rose-50 p-3 rounded-lg text-center"></div>
+                <button onclick="handleLogin()" class="w-full bg-rose-600 text-white py-4 rounded-xl font-bold hover:bg-rose-700 transition shadow-lg shadow-rose-100 flex items-center justify-center gap-2">
+                    <i data-lucide="log-in" class="w-5 h-5"></i> Login to Dashboard
+                </button>
+            </div>
+            <div class="text-center">
+                <p class="text-slate-400 text-xs italic">Default: admin / admin123</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex min-h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <aside class="w-72 bg-white border-r border-slate-200 hidden md:flex flex-col z-20">
+            <div class="p-8">
+                <a href="#" onclick="showSection('dashboard')" class="flex items-center gap-3 text-rose-600 font-extrabold text-2xl tracking-tight">
+                    <div class="w-10 h-10 bg-rose-600 text-white rounded-xl flex items-center justify-center shadow-lg shadow-rose-200">
+                        <i data-lucide="droplet" class="w-6 h-6"></i>
+                    </div>
+                    <span>LifeFlow</span>
+                </a>
+            </div>
+            <nav class="flex-1 mt-4">
+                <a href="#" onclick="showSection('dashboard')" class="nav-link flex items-center gap-3 px-6 py-4 hover:bg-slate-50 transition active-link" id="link-dashboard">
+                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard
+                </a>
+                <a href="#" onclick="showSection('requests')" class="nav-link flex items-center gap-3 px-6 py-4 hover:bg-slate-50 transition" id="link-requests">
+                    <i data-lucide="message-square" class="w-5 h-5"></i> Blood Requests
+                </a>
+                <a href="#" onclick="showSection('donors')" class="nav-link flex items-center gap-3 px-6 py-4 hover:bg-slate-50 transition" id="link-donors">
+                    <i data-lucide="users" class="w-5 h-5"></i> Donors
+                </a>
+                <a href="#" onclick="showSection('appointments')" class="nav-link flex items-center gap-3 px-6 py-4 hover:bg-slate-50 transition" id="link-appointments">
+                    <i data-lucide="calendar" class="w-5 h-5"></i> Appointments
+                </a>
+                <a href="#" onclick="showSection('inventory')" class="nav-link flex items-center gap-3 px-6 py-4 hover:bg-slate-50 transition" id="link-inventory">
+                    <i data-lucide="database" class="w-5 h-5"></i> Blood Stock
+                </a>
+                <a href="#" onclick="showSection('distributions')" class="nav-link flex items-center gap-3 px-6 py-4 hover:bg-slate-50 transition" id="link-distributions">
+                    <i data-lucide="arrow-up-right" class="w-5 h-5"></i> Distributions
+                </a>
+                <a href="#" onclick="showSection('donations')" class="nav-link flex items-center gap-3 px-6 py-4 hover:bg-slate-50 transition" id="link-donations">
+                    <i data-lucide="plus-circle" class="w-5 h-5"></i> Donations
+                </a>
+                <a href="#" onclick="showSection('patients')" class="nav-link flex items-center gap-3 px-6 py-4 hover:bg-slate-50 transition" id="link-patients">
+                    <i data-lucide="heart-pulse" class="w-5 h-5"></i> Patients
+                </a>
+                <a href="#" onclick="showSection('hospitals')" class="nav-link flex items-center gap-3 px-6 py-4 hover:bg-slate-50 transition" id="link-hospitals">
+                    <i data-lucide="building-2" class="w-5 h-5"></i> Hospitals
+                </a>
+                <a href="#" onclick="showSection('blood-banks')" class="nav-link flex items-center gap-3 px-6 py-4 hover:bg-slate-50 transition" id="link-blood-banks">
+                    <i data-lucide="home" class="w-5 h-5"></i> Blood Banks
+                </a>
+                <a href="#" onclick="showSection('staff')" class="nav-link flex items-center gap-3 px-6 py-4 hover:bg-slate-50 transition" id="link-staff">
+                    <i data-lucide="shield-check" class="w-5 h-5"></i> Staff Management
+                </a>
+                <a href="public.html" class="flex items-center gap-3 px-6 py-4 text-slate-400 hover:text-rose-600 transition border-t border-slate-50 mt-auto">
+                    <i data-lucide="external-link" class="w-4 h-4"></i> View Public Site
+                </a>
+            </nav>
+            <div class="p-6 border-t border-slate-200">
+                <div class="bg-rose-50 p-4 rounded-xl">
+                    <p class="text-sm text-rose-700 font-medium">Need Help?</p>
+                    <p class="text-xs text-rose-600 mt-1">Contact system admin</p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 flex flex-col h-screen overflow-hidden">
+            <!-- Top Header -->
+            <header class="bg-white border-b border-slate-200 p-4 flex justify-between items-center px-8 shrink-0">
+                <h2 class="text-xl font-semibold text-slate-700" id="section-title">Dashboard</h2>
+                <div class="flex items-center gap-4">
+                    <button onclick="handleLogout()" class="flex items-center gap-2 bg-slate-50 hover:bg-slate-100 px-4 py-2 rounded-xl transition text-slate-600 font-medium">
+                        <i data-lucide="log-out" class="w-4 h-4"></i>
+                        <span class="text-sm">Logout</span>
+                    </button>
+                    <div class="w-10 h-10 bg-rose-100 rounded-full flex items-center justify-center text-rose-600 font-bold" id="user-initials">AD</div>
+                </div>
+            </header>
+
+            <!-- Scrollable Area -->
+            <div class="flex-1 overflow-y-auto p-8" id="main-area">
+                
+                <!-- Dashboard Section -->
+                <section id="dashboard" class="content-section space-y-8">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition">
+                            <div class="w-12 h-12 bg-rose-100 text-rose-600 rounded-xl flex items-center justify-center mb-4">
+                                <i data-lucide="users"></i>
+                            </div>
+                            <h3 class="text-slate-500 text-sm font-medium">Total Donors</h3>
+                            <p class="text-3xl font-bold mt-1" id="stat-donors">0</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition">
+                            <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center mb-4">
+                                <i data-lucide="database"></i>
+                            </div>
+                            <h3 class="text-slate-500 text-sm font-medium">Blood Stock (Units)</h3>
+                            <p class="text-3xl font-bold mt-1" id="stat-inventory">0</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition">
+                            <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-xl flex items-center justify-center mb-4">
+                                <i data-lucide="heart-pulse"></i>
+                            </div>
+                            <h3 class="text-slate-500 text-sm font-medium">Total Distributions</h3>
+                            <p class="text-3xl font-bold mt-1" id="stat-patients">0</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition">
+                            <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center mb-4">
+                                <i data-lucide="home"></i>
+                            </div>
+                            <h3 class="text-slate-500 text-sm font-medium">Active Banks</h3>
+                            <p class="text-3xl font-bold mt-1" id="stat-banks">0</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition">
+                            <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center mb-4">
+                                <i data-lucide="shield-check"></i>
+                            </div>
+                            <h3 class="text-slate-500 text-sm font-medium">System Staff</h3>
+                            <p class="text-3xl font-bold mt-1" id="stat-staff">0</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                            <h3 class="font-bold text-lg mb-4">Recent Donors</h3>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left">
+                                    <thead>
+                                        <tr class="text-slate-400 text-xs uppercase tracking-wider border-b border-slate-100">
+                                            <th class="pb-3">Name</th>
+                                            <th class="pb-3">Group</th>
+                                            <th class="pb-3">Contact</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="recent-donors-body" class="text-sm">
+                                        <!-- Rows injected by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                            <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+                                <i data-lucide="bar-chart-3" class="w-5 h-5 text-rose-500"></i> Stock by Blood Group
+                            </h3>
+                            <div class="flex items-end gap-3 h-40 px-2" id="stock-chart-bars">
+                                <!-- Bars injected by JS -->
+                            </div>
+                        </div>
+                        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                            <h3 class="font-bold text-lg mb-4 text-rose-600 flex items-center gap-2">
+                                <i data-lucide="alert-circle" class="w-5 h-5"></i> Critical Stock Alert
+                            </h3>
+                            <div class="space-y-4" id="stock-alerts">
+                                <!-- Alerts injected by JS -->
+                                <p class="text-slate-400 text-sm">Monitoring stock levels...</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Table Sections (Hidden by default) -->
+                <section id="table-view" class="content-section hidden bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                    <div class="p-6 border-b border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4">
+                        <div class="flex items-center gap-4 w-full md:w-auto">
+                            <h3 class="font-bold text-lg whitespace-nowrap" id="table-title">Data Table</h3>
+                            <div class="relative w-full md:w-64">
+                                <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"></i>
+                                <input type="text" id="table-search" placeholder="Search..." class="pl-10 pr-4 py-2 w-full border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-rose-500 outline-none transition">
+                            </div>
+                            <select id="group-filter" class="hidden border border-slate-200 rounded-lg text-sm px-3 py-2 focus:ring-2 focus:ring-rose-500 outline-none">
+                                <option value="">All Groups</option>
+                                <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
+                                <option>AB+</option><option>AB-</option><option>O+</option><option>O-</option>
+                            </select>
+                            <div id="status-toggle-container" class="hidden flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-lg border border-slate-100">
+                                <input type="checkbox" id="status-toggle" class="w-4 h-4 accent-rose-600 cursor-pointer" onchange="filterData()">
+                                <label for="status-toggle" class="text-xs font-bold text-slate-500 cursor-pointer uppercase">Pending Only</label>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 w-full md:w-auto">
+                            <button onclick="exportToCSV()" class="p-2 text-slate-500 hover:bg-slate-100 rounded-lg transition" title="Export CSV">
+                                <i data-lucide="download"></i>
+                            </button>
+                            <button id="add-btn" class="bg-rose-600 text-white px-4 py-2 rounded-lg hover:bg-rose-700 transition flex items-center gap-2 text-sm font-medium shrink-0">
+                                <i data-lucide="plus" class="w-4 h-4"></i> Add New
+                            </button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead id="table-head" class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider">
+                                <!-- Head injected by JS -->
+                            </thead>
+                            <tbody id="table-body" class="text-sm">
+                                <!-- Body injected by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl w-full max-w-md overflow-hidden shadow-2xl scale-95 transition-transform">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center">
+                <h3 class="font-bold text-lg">Add New Entry</h3>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x"></i></button>
+            </div>
+            <form id="entry-form" class="p-6 space-y-4">
+                <!-- Form fields injected by JS -->
+            </form>
+            <div class="p-6 bg-slate-50 flex justify-end gap-3">
+                <button onclick="closeModal()" class="px-4 py-2 text-slate-600 hover:bg-slate-200 rounded-lg transition text-sm">Cancel</button>
+                <button id="save-btn" class="px-6 py-2 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition text-sm font-bold">Save Record</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed top-6 right-6 z-[200] space-y-3 pointer-events-none"></div>
+
+    <script src="js/app.js"></script>
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+    </script>
+</body>
+</html>
